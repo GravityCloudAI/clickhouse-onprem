@@ -2,10 +2,15 @@
 
 This docker compose is to enable Clickhouse on-prem deployment with Zookeeper and Multi-Replica Clickhouse with storage as Wasabi/S3 buckets
 
+## Why Wasabi?
+Wasabi is extremely low-cost compared to AWS S3 and does not charge any egress fee!
+
 ## How does this work?
 
 1. Zookeeper syncs data between multiple clickhouse replicas
-2. Clickhouse by defaults uses local disk to store the data and every 10s sync to Wasabi/S3. `You can also update the storage config to use s3 as <cold> and use a TTL table in clickhouse to sync`
+2. Clickhouse by defaults uses local disk to store the data and every 10s sync to Wasabi/S3.
+> [!TIP]
+> You can also update the storage config tiered for s3 as "cold" and use a TTL table in clickhouse to sync every few seconds.
 
 ## How to run?
 `docker compose up -d`
