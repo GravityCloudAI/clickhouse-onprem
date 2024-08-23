@@ -1,0 +1,51 @@
+services:
+  zookeeper-1:
+    image: bitnami/zookeeper:3.7.1
+    container_name: clickhouse-zookeeper-1
+    hostname: zookeeper-1
+    user: root
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+    volumes:
+      - /var/lib/docker/volumes/zook-vol/_data/:/bitnami/zookeeper
+    environment:
+      - ZOO_SERVER_ID=1
+      # - ZOO_SERVERS=0.0.0.0:2888:3888,zookeeper-2:2888:3888,zookeeper-3:2888:3888
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_AUTOPURGE_INTERVAL=1
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.1.2-alpine
+    container_name: clickhouse
+    tty: true
+    restart: on-failure
+    user: "0"
+    logging:
+      options:
+        max-size: 50m
+        max-file: "3"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "127.0.0.1:8123/ping"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    ports:
+      - "127.0.0.1:8123:8123"
+    volumes:
+      - ./clickhouse-config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse-users.xml:/etc/clickhouse-server/users.xml
+      - ./clickhouse-cluster.xml:/etc/clickhouse-server/config.d/cluster.xml
+      - ./custom-function.xml:/etc/clickhouse-server/custom-function.xml
+      - ./clickhouse-storage.xml:/etc/clickhouse-server/config.d/storage.xml
+    environment:
+      - CLICKHOUSE_USER=<USERNAME>
+      - CLICKHOUSE_PASSWORD=<PASSWORD>
