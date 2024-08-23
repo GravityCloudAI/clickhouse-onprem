@@ -44,7 +44,6 @@ services:
       - ./clickhouse-config.xml:/etc/clickhouse-server/config.xml
       - ./clickhouse-users.xml:/etc/clickhouse-server/users.xml
       - ./clickhouse-cluster.xml:/etc/clickhouse-server/config.d/cluster.xml
-      - ./custom-function.xml:/etc/clickhouse-server/custom-function.xml
       - ./clickhouse-storage.xml:/etc/clickhouse-server/config.d/storage.xml
     environment:
       - CLICKHOUSE_USER=<USERNAME>
