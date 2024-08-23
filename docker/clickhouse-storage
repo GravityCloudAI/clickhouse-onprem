@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<clickhouse>
+    <storage_configuration>
+        <disks>
+            <default>
+                <keep_free_space_bytes>10485760</keep_free_space_bytes>
+            </default>
+            <s3>
+                <type>s3</type>
+                <!-- For S3 cold storage,
+                    if region is us-east-1, endpoint can be https://<bucket-name>.s3.amazonaws.com
+                    if region is not us-east-1, endpoint should be https://<bucket-name>.s3-<region>.amazonaws.com
+                For GCS cold storage,
+                    endpoint should be https://storage.googleapis.com/<bucket-name>/data/
+                -->
+                <endpoint>https://s3.wasabisys.com/WASABI_BUCKET_NAME/data/</endpoint>
+                <access_key_id>WASABI_ACCESS_KEY_ID</access_key_id>
+                <secret_access_key>WASABI_SECRET_ACCESS_KEY</secret_access_key>
+                <!-- In case of S3, uncomment the below configuration in case you want to read
+                AWS credentials from the Environment variables if they exist. -->
+                <!-- <use_environment_credentials>true</use_environment_credentials> -->
+                <!-- In case of GCS, uncomment the below configuration, since GCS does
+                not support batch deletion and result in error messages in logs. -->
+                <!-- <support_batch_delete>false</support_batch_delete> -->
+            </s3>
+        </disks>
+        <policies>
+            <tiered>
+                <volumes>
+                    <default>
+                        <disk>default</disk>
+                    </default>
+                    <s3>
+                        <disk>s3</disk>
+                        <perform_ttl_move_on_insert>0</perform_ttl_move_on_insert>
+                    </s3>
+                </volumes>
+            </tiered>
+        </policies>
+    </storage_configuration>
+    <merge_tree>
+        <storage_policy>tiered</storage_policy>
+        <parts_to_throw_insert>100000</parts_to_throw_insert>
+        <parts_to_delay_insert>10000</parts_to_delay_insert>
+        <merge_with_ttl_timeout>10</merge_with_ttl_timeout> <!-- Move data to S3 after 10 seconds -->
+    </merge_tree>
+</clickhouse>
